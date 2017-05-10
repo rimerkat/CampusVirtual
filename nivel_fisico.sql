@@ -1,4 +1,9 @@
--- CAMPUS VIRTUAL. NIVEL FISICO. Grupo MATRIX.
+-- CAMPUS VIRTUAL. NIVEL FISICO. 
+-- Grupo MATRIX: 
+--  María , 
+--  Nadia Carrera Chahir, 
+--  Joaquín, 
+--  Rime Raissouni.
 
 --1. Crear un espacio de tablas denominado TS_CAMPUS
 create tablespace TS_CAMPUS datafile 'tscampus.dbf' size 10M autoextend on;
@@ -9,7 +14,7 @@ create user CAMPUS identified by campus default tablespace TS_CAMPUS quota 100M 
 grant connect with admin option, create table, create view, create procedure to CAMPUS;
 
 --3. Conectarse como CAMPUS y ejecutar el script para crear las tablas.
--- Ver script y ejecutarlo
+-- Ver script modelo_relacional.sql y ejecutarlo
 
 --4. Crear Roles R_PROFESOR, R_ALUMNO, R_ADMINISTRATIVO
 create role R_PROFESOR;
@@ -61,10 +66,22 @@ BEGIN
   EXECUTE IMMEDIATE 'create user '|| USUARIO || ' identified by '|| USUARIO ||' default tablespace TS_CAMPUS quota 10M on TS_CAMPUS';
   EXECUTE IMMEDIATE ‘grant R_ALUMNO TO ’||USUARIO;
 END PR_ASIGNA_USUARIO;
---- Modificamos el script de tablas ---
+--- Modificamos el script de tablas creando la tabla ORACLE. ORACLE es la tabla de usuarios ORACLE. ---
 create table ORACLE (id number not null primary key, user varchar2(30) not null, pass varchar2(30) not null) ;
 alter table ORACLE add USUARIOS_id Number;
 ALTER TABLE ORACLE ADD CONSTRAINT ORACLE_USUARIOS_FK FOREIGN KEY ( USUARIOS_id ) REFERENCES USUARIOS ( id ) ;
+
+--7.2 Crear los mecanismos necesarios (evalúe las diferentes posibilidades) para que cada alumno sólo pueda ver sus propios datos.
+create view V_DATOS_USUARIO AS
+select * from USUARIOS us
+join ORACLE ora on ora.USUARIOS_id = us.id
+where USER = ora.user;
+-- damos permiso de ver esos datos
+grant select on V_DATOS_USUARIO to R_ALUMNO;
+
+--7.3 Dar permiso para Insertar en la vista V_RESULTADO (hay que crearla). Es la vista en la que el alumno guarda la respuesta a una pregunta. Deberá contener datos del alumno, la pregunta y la respuesta. Obviamente un alumno no puede contestar por otro, por lo que habrá que validar el usuario.
+
+
 
 --8. Crear una tabla CONEXIONES con los campos SESIONID, USUARIO, IP, MAQUINA, INICIO, FIN. Crear un trigger de manera que cada vez que un usuario de la base de datos se conecte se almacene en la tabla CONEXIONES su número de sesión, usuario, ip desde donde se conecta, máquina y fecha del sistema. Utilizar la funicón SYS_CONTEXT:
 -- Conectado desde CAMPUS
