@@ -67,7 +67,7 @@ BEGIN
   EXECUTE IMMEDIATE ‘grant R_ALUMNO TO ’||USUARIO;
 END PR_ASIGNA_USUARIO;
 --- Modificamos el script de tablas creando la tabla ORACLE. ORACLE es la tabla de usuarios ORACLE. ---
-create table ORACLE (id number not null primary key, user varchar2(30) not null, pass varchar2(30) not null) ;
+create table ORACLE (id number not null primary key, miuser varchar2(30) not null, pass varchar2(30) not null) ;
 alter table ORACLE add USUARIOS_id Number;
 ALTER TABLE ORACLE ADD CONSTRAINT ORACLE_USUARIOS_FK FOREIGN KEY ( USUARIOS_id ) REFERENCES USUARIOS ( id ) ;
 
