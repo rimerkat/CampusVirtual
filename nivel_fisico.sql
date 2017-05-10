@@ -73,8 +73,8 @@ alter table ORACLE add USUARIOS_id Number;
 ALTER TABLE ORACLE ADD CONSTRAINT ORACLE_USUARIOS_FK FOREIGN KEY ( USUARIOS_id ) REFERENCES USUARIOS ( id ) ;
 
 --7.2 Crear los mecanismos necesarios (evalúe las diferentes posibilidades) para que cada alumno sólo pueda ver sus propios datos.
-create view V_DATOS_USUARIO AS
-select * from USUARIOS us
+create or replace view V_DATOS_USUARIO AS
+select us.dni, us.nombre, us.apellidos, us.correo, us.pais from USUARIOS us
 join ORACLE ora on ora.USUARIOS_id = us.id
 where USER = ora.miuser;
 -- damos permiso de ver esos datos
@@ -83,19 +83,17 @@ grant select on V_DATOS_USUARIO to R_ALUMNO;
 --7.3 Dar permiso para Insertar en la vista V_RESULTADO (hay que crearla). Es la vista en la que el alumno guarda la respuesta a una pregunta. Deberá contener datos del alumno, la pregunta y la respuesta. Obviamente un alumno no puede contestar por otro, por lo que habrá que validar el usuario.
 create or replace view V_RESULTADO as
 select us.nombre as ALU_NOMBRE, us.apellidos as ALU_APELLIDOS, us.dni, us.pais, us.correo, asig.nombre as ASIG_NOMBRE, act.nombre as ACT_NOMBRE, pre.pregunta, res.respuesta
-from RESPUESTAS res
-join USUARIOS us on res.USUARIOS_ID = us.id
+from USUARIOS us 
 join ROL_US_AS r on r.USUARIOS_ID = us.id 
 join ASIGNATURAS asig on r.ASIGNATURAS_ID = asig.id
-join ROLES roles on roles.rol = r.ROLES_ROL
+join ROLES on roles.rol = r.ROLES_ROL
 join ACTIVIDADES act on act.asignaturas_id = asig.id
 join PREGUNTAS pre on pre.cuestionarios_id = act.id
-left outer join RESPUESTAS res on res.Preguntas_id = pre.id
+left outer join RESPUESTAS res on res.Preguntas_id = pre.id and res.USUARIOS_ID = us.id
 join ORACLE ora on ora.USUARIOS_id = us.id
 where USER = ora.miuser and roles.nombre='estudiante';
 -- damos permisos
 grant select on V_RESULTADO to R_ALUMNO;
-
 
 
 --8. Crear una tabla CONEXIONES con los campos SESIONID, USUARIO, IP, MAQUINA, INICIO, FIN. Crear un trigger de manera que cada vez que un usuario de la base de datos se conecte se almacene en la tabla CONEXIONES su número de sesión, usuario, ip desde donde se conecta, máquina y fecha del sistema. Utilizar la funicón SYS_CONTEXT:
