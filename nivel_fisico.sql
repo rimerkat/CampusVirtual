@@ -134,10 +134,6 @@ create user ADMINISTRATIVO identified by admatrix
   quota 10M on TS_CAMPUS;
 grant R_ADMINISTRATIVO to ADMINISTRATIVO;
 
---- SENTENCIAS PARA COMPROBAR QUE TODO FUNCIONE BIEN
+--- SENTENCIAS PARA TESTING
 
-*********** PENDIENTE POR EJECUTAR EN MI MAQUINA ****
---grant connect to R_PROFESOR;
---grant connect to R_ADMINISTRATIVO;
---7.
---8.
+
