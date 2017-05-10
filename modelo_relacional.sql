@@ -3,8 +3,8 @@
 --   sitio:      Oracle Database 11g
 --   tipo:      Oracle Database 11g
 
-
-
+-- TODO EL SCRIPT SE EJECUTA DEL USUARIO CAMPUS
+-- SCRIPT FINAL (INCLUYENDO LAS MODIFICACIONES SOLICITADAS EN LA TAREA NIVEL FISICO + DATOS INTRODUCIDOS)
 
 CREATE TABLE ACTIVIDADES
   (
@@ -271,7 +271,7 @@ ALTER TABLE TAREAS ADD CONSTRAINT TAREAS_ACTIVIDADES_FK FOREIGN KEY ( id ) REFER
 
 ALTER TABLE TITULACIONES ADD CONSTRAINT TITULACIONES_CENTROS_FK FOREIGN KEY ( CENTROS_id ) REFERENCES CENTROS ( id ) ;
 
--- Modificaciones solicitadas en la tarea de nivel físico
+-- MODIFICACIONES DE LA TAREA NIVEL FISICO
 
 CREATE TABLE ORACLE (id number not null primary key, user varchar2(30) not null, pass varchar2(30) not null) ;
 
@@ -282,12 +282,42 @@ ALTER TABLE ORACLE ADD CONSTRAINT ORACLE_USUARIOS_FK FOREIGN KEY ( USUARIOS_id )
 CREATE TABLE CONEXIONES(
     sesionid     NUMBER NOT NULL PRIMARY KEY,
     usuario      VARCHAR2(50) NOT NULL ,
-    ip           NUMBER,
-    maquina      NUMBER,
+    ip           VARCHAR2(20),
+    maquina      VARCHAR2(20),
     inicio       DATE,
     fin          DATE
   ) ;
 
+-- INTRODUCCION DE DATOS
+
+INSERT INTO USUARIOS VALUES (12, ‘U454655’, 'Alberto','Jimenez Alvarez','ajalvarez@gmail.com','españa',''); 
+INSERT INTO USUARIOS VALUES (21, 'H789565', 'Juan','Fraud Mango','jfmango@gmail.com','españa',''); 
+INSERT INTO USUARIOS VALUES (89, 'Y896453E', 'Ram','Faharadi Kariji','ramfk@gmail.com',’india’,''); 
+INSERT INTO USUARIOS VALUES (37, 'A852696', 'Alicia','Llaves Negras','allavesn@gmail.com','españa',''); 
+INSERT INTO CENTROS VALUES (01, 'www.uma.es/etsi-informatica/', 'ETSII');
+INSERT INTO TITULACIONES VALUES (1, 'Ingenieria Informatica', '',01);
+INSERT INTO ASIGNATURAS VALUES (411, '2015/16', 'Base de datos','A','1'); 
+INSERT INTO ASIGNATURAS VALUES (412, '2015/16', 'Sistemas de Internet','A','1');
+INSERT INTO ASIGNATURAS VALUES (413, '2015/16', 'Procesadores de Lenguaje','A','1');
+INSERT INTO ASIGNATURAS VALUES (421, '2015/16', 'Logica Computacional','A','1');
+INSERT INTO ROLES VALUES ('0', 'estudiante');
+INSERT INTO ROLES VALUES ('1', 'profesor');
+INSERT INTO NOTAS_FINALES VALUES ('Aprobado', 6, 411, 12);
+INSERT INTO NOTAS_FINALES VALUES ('Notable', 8, 412, 12);
+INSERT INTO NOTAS_FINALES VALUES ('Notable', 7, 421, 12);
+INSERT INTO NOTAS_FINALES VALUES ('Sobresaliente', 9, 411, 37);
+INSERT INTO NOTAS_FINALES VALUES ('Matricula', 10, 421, 37);
+INSERT INTO NOTAS_FINALES VALUES ('Notable', 8, 413, 37);
+INSERT INTO ROL_US_AS VALUES ('0', 421, 37);
+INSERT INTO ROL_US_AS VALUES ('0', 413, 37);
+INSERT INTO ROL_US_AS VALUES ('0', 411, 37);
+INSERT INTO ROL_US_AS VALUES ('0', 411, 12);
+INSERT INTO ROL_US_AS VALUES ('0', 412, 12);
+INSERT INTO ROL_US_AS VALUES ('0', 421, 12);
+INSERT INTO ROL_US_AS VALUES ('1', 413, 89);
+INSERT INTO ROL_US_AS VALUES ('1', 421, 89);
+INSERT INTO ROL_US_AS VALUES ('1', 411, 21);
+INSERT INTO ROL_US_AS VALUES ('1', 412, 21);
 
 -- ************************ HASTA AQUI SE EJECUTA *********************
 
