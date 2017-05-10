@@ -122,8 +122,8 @@ ALTER TABLE MENSAJES ADD CONSTRAINT MENSAJES_PK PRIMARY KEY ( fecha, USUARIOS_id
 
 CREATE TABLE NOTAS_FINALES
   (
-    nota           VARCHAR2 (30),
-    calificacion   NUMBER,
+    nota           NUMBER,
+    calificacion   VARCHAR2 (30),
     ASIGNATURAS_id NUMBER NOT NULL ,
     USUARIOS_id    NUMBER NOT NULL
   ) ;
