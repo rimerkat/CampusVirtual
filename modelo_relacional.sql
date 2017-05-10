@@ -73,7 +73,7 @@ ALTER TABLE CUESTIONARIOS ADD CONSTRAINT CUESTIONARIOS_PK PRIMARY KEY ( id ) ;
 
 
 CREATE TABLE DIARIO
-  ( id NUMBER NOT NULL , descripción VARCHAR2 (500)
+  ( id NUMBER NOT NULL , descripciÃ³n VARCHAR2 (500)
   ) ;
 ALTER TABLE DIARIO ADD CONSTRAINT DIARIO_PK PRIMARY KEY ( id ) ;
 
@@ -271,13 +271,7 @@ ALTER TABLE TAREAS ADD CONSTRAINT TAREAS_ACTIVIDADES_FK FOREIGN KEY ( id ) REFER
 
 ALTER TABLE TITULACIONES ADD CONSTRAINT TITULACIONES_CENTROS_FK FOREIGN KEY ( CENTROS_id ) REFERENCES CENTROS ( id ) ;
 
--- Modificaciones solicitadas en la tarea de nivel físico
-
-ALTER TABLE Respuestas ADD Corrector_id Number;
-
-ALTER TABLE Respuestas ADD correccion Varchar2(200);
-
-ALTER TABLE Respuestas ADD CONSTRAINT Respuestas_USUARIOS_FKv1 FOREIGN KEY ( Corrector_id ) REFERENCES USUARIOS ( id ) ;
+-- Modificaciones solicitadas en la tarea de nivel fÃ­sico
 
 CREATE TABLE ORACLE (id number not null primary key, user varchar2(30) not null, pass varchar2(30) not null) ;
 
