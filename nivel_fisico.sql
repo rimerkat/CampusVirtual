@@ -30,6 +30,7 @@ grant select, insert, alter, delete on ASIGNATURAS to R_ADMINISTRATIVO;
 --5.3. Matricular a un alumno en una asignatura. Borrar o modificar la matrícula.
 grant select, insert, alter, delete on Rol_Us_As to R_ADMINISTRATIVO;
 --5.4. Leer la calificación final de los alumnos. Realmente se debe poder leer la nota, la calificación, el nombre de la asignatura, el curso y todos los datos del alumno, por lo que habrá que crear una vista.
+
 -- Creamos la vista
 create view V_CALIFICACIONES as
 select asig.NOMBRE as ASIG_NOMBRE, asig.curso, us.nombre as ALU_NOMBRE, us.apellidos as ALU_APELLIDOS, us.dni, us.pais, us. correo, nf.CALIFICACION, nf.NOTA
@@ -75,7 +76,7 @@ ALTER TABLE ORACLE ADD CONSTRAINT ORACLE_USUARIOS_FK FOREIGN KEY ( USUARIOS_id )
 create view V_DATOS_USUARIO AS
 select * from USUARIOS us
 join ORACLE ora on ora.USUARIOS_id = us.id
-where USER = ora.user;
+where USER = ora.miuser;
 -- damos permiso de ver esos datos
 grant select on V_DATOS_USUARIO to R_ALUMNO;
 
@@ -91,7 +92,7 @@ join ACTIVIDADES act on act.asignaturas_id = asig.id
 join PREGUNTAS pre on pre.cuestionarios_id = act.id
 left outer join RESPUESTAS res on res.Preguntas_id = pre.id
 join ORACLE ora on ora.USUARIOS_id = us.id
-where USER = ora.user and roles.nombre='estudiante';
+where USER = ora.miuser and roles.nombre='estudiante';
 -- damos permisos
 grant select on V_RESULTADO to R_ALUMNO;
 
