@@ -67,12 +67,25 @@ grant connect to R_ALUMNO;
 create table ORACLE (id number not null primary key, miuser varchar2(30) not null, pass varchar2(30) not null) ;
 alter table ORACLE add USUARIOS_id Number;
 ALTER TABLE ORACLE ADD CONSTRAINT ORACLE_USUARIOS_FK FOREIGN KEY ( USUARIOS_id ) REFERENCES USUARIOS ( id ) ;
+
 -- Creamos el procedimiento
 create or replace procedure PR_ASIGNA_USUARIO(US_ID IN NUMBER, US_ORACLE IN VARCHAR2) AS
+  ROL VARCHAR2(2);
 BEGIN
+  -- Almacenamos el rol del usuario para darle los permisos correspondientes más tarde. 
+  -- Por ahora suponemos que un usuario solo puede tener uno de los tres posibles roles.
+  SELECT DISTINCT ROL_US_AS.ROLES_ROL INTO ROL FROM ROL_US_AS WHERE USUARIOS_ID = US_ID;  
+  -- Creamos su correspondiente usuario oracle y lo relacionamos con la tabla USUARIOS
   EXECUTE IMMEDIATE 'create user '|| US_ORACLE || ' identified by '|| US_ORACLE ||' default tablespace TS_CAMPUS quota 10M on TS_CAMPUS';
-  EXECUTE IMMEDIATE 'grant R_ALUMNO TO '||US_ORACLE;
   INSERT INTO ORACLE VALUES (US_ID||''||to_char(DBMS_RANDOM.value(10,999)), US_ORACLE, US_ORACLE, US_ID);
+  -- Damos los permisos correspondientes
+  IF ROL = '0' THEN --estudiante
+    EXECUTE IMMEDIATE 'grant R_ALUMNO TO '||US_ORACLE;
+  ELSE IF ROL = '1' THEN --profesor
+    EXECUTE IMMEDIATE 'grant R_PROFESOR TO '||US_ORACLE;
+  ELSE --administrativo
+    EXECUTE IMMEDIATE 'grant R_ADMINISTRATIVO TO '||US_ORACLE;
+  END IF;
 END PR_ASIGNA_USUARIO;
 
 --7.2 Crear los mecanismos necesarios (evalúe las diferentes posibilidades) para que cada alumno sólo pueda ver sus propios datos.
