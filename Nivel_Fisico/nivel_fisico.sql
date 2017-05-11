@@ -71,14 +71,18 @@ ALTER TABLE ORACLE ADD CONSTRAINT ORACLE_USUARIOS_FK FOREIGN KEY ( USUARIOS_id )
 -- Antes de crear el procedimiento damos los siguientes permisos a CAMPUS desde SYSTEM:
 grant create, alter, drop user to CAMPUS;
 -- Creamos el procedimiento
-create or replace procedure PR_ASIGNA_USUARIO(US_ID IN NUMBER, US_ORACLE IN VARCHAR2) AS
+create or replace procedure PR_ASIGNA_USUARIO(US_ID IN NUMBER, US_ORACLE IN VARCHAR2, US_ROL IN VARCHAR2) AS
+-- Almacenamos el rol del usuario para darle los permisos correspondientes más tarde.
   ROL VARCHAR2(2);
 BEGIN
-  -- Almacenamos el rol del usuario para darle los permisos correspondientes más tarde. 
+-- Si el parámetro US_ROL no se especifica, se busca en los datos de la tabla USUARIOS.
+  IF US_ROL != '' THEN ROL := US_ROL
+  ELSE  
   -- Por ahora suponemos que un usuario solo puede tener uno de los tres posibles roles.
-  SELECT DISTINCT ROL_US_AS.ROLES_ROL INTO ROL FROM ROL_US_AS WHERE USUARIOS_ID = US_ID;  
+    SELECT DISTINCT ROL_US_AS.ROLES_ROL INTO ROL FROM ROL_US_AS WHERE USUARIOS_ID = US_ID;
+  END IF;
   -- Creamos su correspondiente usuario oracle y lo relacionamos con la tabla USUARIOS
-  EXECUTE IMMEDIATE 'create user '|| US_ORACLE || ' identified by '|| US_ORACLE ||' default tablespace TS_CAMPUS quota 10M on TS_CAMPUS';
+   EXECUTE IMMEDIATE 'create user '|| US_ORACLE || ' identified by '|| US_ORACLE ||' default tablespace TS_CAMPUS quota 10M on TS_CAMPUS';
   INSERT INTO ORACLE VALUES (US_ID||''||to_char(DBMS_RANDOM.value(10,999)), US_ORACLE, US_ORACLE, US_ID);
   -- Damos los permisos correspondientes
   IF ROL = '0' THEN --estudiante
@@ -135,24 +139,12 @@ BEGIN
   SELECT SYS_CONTEXT('USERENV','SESSIONID'), SYS_CONTEXT('USERENV','SESSION_USER'), SYS_CONTEXT('USERENV','IP_ADDRESS'), SYS_CONTEXT('USERENV','HOST'), SYSDATE FROM DUAL;
 END;
 
---9. Crear al menos un usuario de cada role y probar que todo funciona según lo diseñado
--- Conectado desde SYSTEM
-grant create, drop, update user to CAMPUS;
--- desde CAMPUS
-create user ALUMNO identified by almatrix
-  default tablespace TS_CAMPUS
-  quota 10M on TS_CAMPUS;
-grant R_ALUMNO to ALUMNO;
+--9. Crear al menos un usuario de cada rol y probar que todo funciona según lo diseñado
 
-create user PROFESOR identified by pmatrix
-  default tablespace TS_CAMPUS
-  quota 10M on TS_CAMPUS;
-grant R_PROFESOR to PROFESOR;
-
-create user ADMINISTRATIVO identified by admatrix
-  default tablespace TS_CAMPUS
-  quota 10M on TS_CAMPUS;
-grant R_ADMINISTRATIVO to ADMINISTRATIVO;
+EXECUTE PR_ASIGNA_USUARIO(90,'DAVID'); -- admnistrativo
+EXECUTE PR_ASIGNA_USUARIO(37,'ALICIA'); -- alumna
+EXECUTE PR_ASIGNA_USUARIO(12,'ALBERTO'); -- alumno
+EXECUTE PR_ASIGNA_USUARIO(89,'RAM'); -- profesor
 
 --- SENTENCIAS PARA TESTING
 
