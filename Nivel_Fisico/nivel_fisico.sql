@@ -68,6 +68,8 @@ create table ORACLE (id number not null primary key, miuser varchar2(30) not nul
 alter table ORACLE add USUARIOS_id Number;
 ALTER TABLE ORACLE ADD CONSTRAINT ORACLE_USUARIOS_FK FOREIGN KEY ( USUARIOS_id ) REFERENCES USUARIOS ( id ) ;
 
+-- Antes de crear el procedimiento damos los siguientes permisos a CAMPUS desde SYSTEM:
+grant create, alter, drop user to CAMPUS;
 -- Creamos el procedimiento
 create or replace procedure PR_ASIGNA_USUARIO(US_ID IN NUMBER, US_ORACLE IN VARCHAR2) AS
   ROL VARCHAR2(2);
