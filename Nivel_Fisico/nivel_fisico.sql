@@ -62,22 +62,26 @@ grant select, insert, alter, delete on RESPUESTAS to R_PROFESOR;
 --7.1 Conectarse. Hay que modificar el esquema para que cada usuario tenga un USUARIO de Oracle con el que se conecte. Crear un procedimiento almacenado que a cada usuario de la tabla USUARIOS le asigne un usuario de Oracle y una palabra de paso. El procedimiento también asignará los permisos necesarios al usuario.
 -- Conectado desde CAMPUS
 grant connect to R_ALUMNO;
--- Creamos el procedimiento
-create or replace procedure PR_ASIGNA_USUARIO(USUARIO IN VARCHAR2) AS
-BEGIN
-  EXECUTE IMMEDIATE 'create user '|| USUARIO || ' identified by '|| USUARIO ||' default tablespace TS_CAMPUS quota 10M on TS_CAMPUS';
-  EXECUTE IMMEDIATE ‘grant R_ALUMNO TO ’||USUARIO;
-END PR_ASIGNA_USUARIO;
---- Modificamos el script de tablas creando la tabla ORACLE. ORACLE es la tabla de usuarios ORACLE. ---
+
+--- Creamos la tabla ORACLE que representa los usuarios de ORACLE. 
 create table ORACLE (id number not null primary key, miuser varchar2(30) not null, pass varchar2(30) not null) ;
 alter table ORACLE add USUARIOS_id Number;
 ALTER TABLE ORACLE ADD CONSTRAINT ORACLE_USUARIOS_FK FOREIGN KEY ( USUARIOS_id ) REFERENCES USUARIOS ( id ) ;
+-- Creamos el procedimiento
+create or replace procedure PR_ASIGNA_USUARIO(US_ID IN NUMBER, US_ORACLE IN VARCHAR2) AS
+BEGIN
+  EXECUTE IMMEDIATE 'create user '|| US_ORACLE || ' identified by '|| US_ORACLE ||' default tablespace TS_CAMPUS quota 10M on TS_CAMPUS';
+  EXECUTE IMMEDIATE 'grant R_ALUMNO TO '||US_ORACLE;
+  INSERT INTO ORACLE VALUES (US_ID||''||to_char(DBMS_RANDOM.value(10,999)), US_ORACLE, US_ORACLE, US_ID);
+END PR_ASIGNA_USUARIO;
 
 --7.2 Crear los mecanismos necesarios (evalúe las diferentes posibilidades) para que cada alumno sólo pueda ver sus propios datos.
 create or replace view V_DATOS_USUARIO AS
 select us.dni, us.nombre, us.apellidos, us.correo, us.pais from USUARIOS us
 join ORACLE ora on ora.USUARIOS_id = us.id
-where USER = ora.miuser;
+join ROL_US_AS r on r.USUARIOS_ID = us.id 
+join ROLES on roles.rol = r.ROLES_ROL
+where USER = ora.miuser and roles.nombre='estudiante';
 -- damos permiso de ver esos datos
 grant select on V_DATOS_USUARIO to R_ALUMNO;
 
