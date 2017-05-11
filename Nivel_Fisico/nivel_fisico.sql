@@ -10,8 +10,9 @@ create tablespace TS_CAMPUS datafile 'tscampus.dbf' size 10M autoextend on;
 
 --2. Crear un usuario denominado CAMPUS con el esquema correspondiente. Darle cuota en TS_CAMPUS y permiso para conectarse, crear tablas, crear vistas, crear procedimientos. Asignarle TS_CAMPUS como TABLESPACE por defecto.
 create user CAMPUS identified by campus default tablespace TS_CAMPUS quota 100M on TS_CAMPUS;
---hacemos connect con admin option para poder crear usuarios dentro de CAMPUS
-grant connect with admin option, create table, create view, create procedure to CAMPUS;
+--hacemos connect con admin option para poder crear usuarios dentro de CAMPUS (se necesita más adelante)
+grant connect with admin option;
+grant create table, create view, create procedure to CAMPUS;
 
 --3. Conectarse como CAMPUS y ejecutar el script para crear las tablas.
 -- Ver script modelo_relacional.sql y ejecutarlo
