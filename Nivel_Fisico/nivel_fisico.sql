@@ -76,18 +76,18 @@ create or replace procedure PR_ASIGNA_USUARIO(US_ID IN NUMBER, US_ORACLE IN VARC
   ROL VARCHAR2(2);
 BEGIN
 -- Si el parámetro US_ROL no se especifica, se busca en los datos de la tabla USUARIOS.
-  IF US_ROL != '' THEN ROL := US_ROL
+  IF US_ROL != '' THEN ROL := US_ROL;
   ELSE  
   -- Por ahora suponemos que un usuario solo puede tener uno de los tres posibles roles.
     SELECT DISTINCT ROL_US_AS.ROLES_ROL INTO ROL FROM ROL_US_AS WHERE USUARIOS_ID = US_ID;
   END IF;
   -- Creamos su correspondiente usuario oracle y lo relacionamos con la tabla USUARIOS
-   EXECUTE IMMEDIATE 'create user '|| US_ORACLE || ' identified by '|| US_ORACLE ||' default tablespace TS_CAMPUS quota 10M on TS_CAMPUS';
+  EXECUTE IMMEDIATE 'create user '|| US_ORACLE || ' identified by '|| US_ORACLE ||' default tablespace TS_CAMPUS quota 10M on TS_CAMPUS';
   INSERT INTO ORACLE VALUES (US_ID||''||to_char(DBMS_RANDOM.value(10,999)), US_ORACLE, US_ORACLE, US_ID);
   -- Damos los permisos correspondientes
   IF ROL = '0' THEN --estudiante
     EXECUTE IMMEDIATE 'grant R_ALUMNO TO '||US_ORACLE;
-  ELSE IF ROL = '1' THEN --profesor
+  ELSIF ROL = '1' THEN --profesor
     EXECUTE IMMEDIATE 'grant R_PROFESOR TO '||US_ORACLE;
   ELSE --administrativo
     EXECUTE IMMEDIATE 'grant R_ADMINISTRATIVO TO '||US_ORACLE;
