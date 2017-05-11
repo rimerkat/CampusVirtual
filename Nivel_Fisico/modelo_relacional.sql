@@ -294,6 +294,7 @@ INSERT INTO USUARIOS VALUES (12, ‘U454655’, 'Alberto','Jimenez Alvarez','aja
 INSERT INTO USUARIOS VALUES (21, 'H789565', 'Juan','Fraud Mango','jfmango@gmail.com','españa',''); 
 INSERT INTO USUARIOS VALUES (89, 'Y896453E', 'Ram','Faharadi Kariji','ramfk@gmail.com',’india’,''); 
 INSERT INTO USUARIOS VALUES (37, 'A852696', 'Alicia','Llaves Negras','allavesn@gmail.com','españa',''); 
+INSERT INTO USUARIOS VALUES (90, ‘B454510’, 'David','Moreno Calvo','dvc@gmail.com','españa',''); 
 INSERT INTO CENTROS VALUES (01, 'www.uma.es/etsi-informatica/', 'ETSII');
 INSERT INTO TITULACIONES VALUES (1, 'Ingenieria Informatica', '',01);
 INSERT INTO ASIGNATURAS VALUES (411, '2015/16', 'Base de datos','A','1'); 
@@ -302,6 +303,7 @@ INSERT INTO ASIGNATURAS VALUES (413, '2015/16', 'Procesadores de Lenguaje','A','
 INSERT INTO ASIGNATURAS VALUES (421, '2015/16', 'Logica Computacional','A','1');
 INSERT INTO ROLES VALUES ('0', 'estudiante');
 INSERT INTO ROLES VALUES ('1', 'profesor');
+INSERT INTO ROLES VALUES ('2', 'administrativo');
 INSERT INTO NOTAS_FINALES VALUES ('Aprobado', 6, 411, 12);
 INSERT INTO NOTAS_FINALES VALUES ('Notable', 8, 412, 12);
 INSERT INTO NOTAS_FINALES VALUES ('Notable', 7, 421, 12);
@@ -318,6 +320,11 @@ INSERT INTO ROL_US_AS VALUES ('1', 413, 89);
 INSERT INTO ROL_US_AS VALUES ('1', 421, 89);
 INSERT INTO ROL_US_AS VALUES ('1', 411, 21);
 INSERT INTO ROL_US_AS VALUES ('1', 412, 21);
+INSERT INTO ROL_US_AS VALUES ('2', 411, 90);
+INSERT INTO ROL_US_AS VALUES ('2', 412, 90);
+INSERT INTO ROL_US_AS VALUES ('2', 413, 90);
+INSERT INTO ROL_US_AS VALUES ('2', 421, 90);
+
 
 -- ************************ HASTA AQUI SE EJECUTA *********************
 
