@@ -290,11 +290,11 @@ CREATE TABLE CONEXIONES(
 
 -- INTRODUCCION DE DATOS
 
-INSERT INTO USUARIOS VALUES (12, ‘U454655’, 'Alberto','Jimenez Alvarez','ajalvarez@gmail.com','españa',''); 
+INSERT INTO USUARIOS VALUES (12, 'U454655', 'Alberto','Jimenez Alvarez','ajalvarez@gmail.com','españa',''); 
 INSERT INTO USUARIOS VALUES (21, 'H789565', 'Juan','Fraud Mango','jfmango@gmail.com','españa',''); 
 INSERT INTO USUARIOS VALUES (89, 'Y896453E', 'Ram','Faharadi Kariji','ramfk@gmail.com',’india’,''); 
 INSERT INTO USUARIOS VALUES (37, 'A852696', 'Alicia','Llaves Negras','allavesn@gmail.com','españa',''); 
-INSERT INTO USUARIOS VALUES (90, ‘B454510’, 'David','Moreno Calvo','dvc@gmail.com','españa',''); 
+INSERT INTO USUARIOS VALUES (90, 'B454510', 'David','Moreno Calvo','dvc@gmail.com','españa',''); 
 INSERT INTO CENTROS VALUES (01, 'www.uma.es/etsi-informatica/', 'ETSII');
 INSERT INTO TITULACIONES VALUES (1, 'Ingenieria Informatica', '',01);
 INSERT INTO ASIGNATURAS VALUES (411, '2015/16', 'Base de datos','A','1'); 
