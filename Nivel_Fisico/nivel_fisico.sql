@@ -89,8 +89,8 @@ BEGIN
     SELECT DISTINCT ROL_US_AS.ROLES_ROL INTO ROL FROM ROL_US_AS WHERE USUARIOS_ID = US_ID;
   END IF;
   -- Creamos su correspondiente usuario oracle y lo relacionamos con la tabla USUARIOS
-  EXECUTE IMMEDIATE 'create user '|| US_ORACLE || ' identified by '|| US_ORACLE ||' default tablespace TS_CAMPUS quota 10M on TS_CAMPUS';
   INSERT INTO ORACLE VALUES (US_ID||''||to_char(trunc(DBMS_RANDOM.value(10,999))), US_ORACLE, US_ORACLE, US_ID);
+  EXECUTE IMMEDIATE 'create user '|| US_ORACLE || ' identified by '|| US_ORACLE ||' default tablespace TS_CAMPUS quota 10M on TS_CAMPUS';
   -- Damos los permisos correspondientes
   IF ROL = '0' THEN --estudiante
     EXECUTE IMMEDIATE 'grant R_ALUMNO TO '||US_ORACLE;
@@ -154,9 +154,9 @@ END;
 --9. Crear al menos un usuario de cada rol y probar que todo funciona según lo diseñado
 
 -- Ya tenemos introducidos los siguientes usuarios del CV en la table USUARIOS (ver modelo_relacional.sql):
-EXECUTE PR_ASIGNA_USUARIO(90,'DAVID'); -- admnistrativo
+EXECUTE PR_ASIGNA_USUARIO(90,'DAVID','2'); -- admnistrativo
 EXECUTE PR_ASIGNA_USUARIO(37,'ALICIA','0'); -- alumna
-EXECUTE PR_ASIGNA_USUARIO(12,'ALBERTO','0'); -- alumno
+EXECUTE PR_ASIGNA_USUARIO(12,'ALBERTO'); -- alumno
 EXECUTE PR_ASIGNA_USUARIO(89,'RAM'); -- profesor
 
 -- Ahora comprobamos que se han creado los usuarios ORACLE:
