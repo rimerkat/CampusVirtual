@@ -10,14 +10,16 @@
 --1. Crear un espacio de tablas denominado TS_CAMPUS
 create tablespace TS_CAMPUS datafile 'tscampus.dbf' size 10M autoextend on;
 
---2. Crear un usuario denominado CAMPUS con el esquema correspondiente. Darle cuota en TS_CAMPUS y permiso para conectarse, crear tablas, crear vistas, crear procedimientos. Asignarle TS_CAMPUS como TABLESPACE por defecto.
+--2. Crear un usuario denominado CAMPUS con el esquema correspondiente. Darle cuota en TS_CAMPUS y permiso para conectarse, 
+-- crear tablas, crear vistas, crear procedimientos. Asignarle TS_CAMPUS como TABLESPACE por defecto.
 create user CAMPUS identified by campus default tablespace TS_CAMPUS quota 100M on TS_CAMPUS;
+
 --hacemos connect con admin option para poder crear usuarios dentro de CAMPUS (se necesita más adelante)
 grant connect with admin option;
 grant create table, create view, create procedure to CAMPUS;
 
 --3. Conectarse como CAMPUS y ejecutar el script para crear las tablas.
--- Ver script modelo_relacional.sql y ejecutarlo
+-- Ejecutar script modelo_relacional.sql 
 
 --4. Crear Roles R_PROFESOR, R_ALUMNO, R_ADMINISTRATIVO
 create role R_PROFESOR;
@@ -28,21 +30,27 @@ create role R_ADMINISTRATIVO;
 --5.1. Seleccionar, insertar, modificar o borrar en la tabla de usuarios
 grant connect to R_ADMINISTRATIVO;
 grant select, insert, alter, delete on USUARIOS to R_ADMINISTRATIVO;
+
 --5.2. Seleccionar, insertar, modificar o borrar de la tabla de asignaturas
 grant select, insert, alter, delete on ASIGNATURAS to R_ADMINISTRATIVO;
+
 --5.3. Matricular a un alumno en una asignatura. Borrar o modificar la matrícula.
 grant select, insert, alter, delete on Rol_Us_As to R_ADMINISTRATIVO;
---5.4. Leer la calificación final de los alumnos. Realmente se debe poder leer la nota, la calificación, el nombre de la asignatura, el curso y todos los datos del alumno, por lo que habrá que crear una vista.
+
+--5.4. Leer la calificación final de los alumnos. Realmente se debe poder leer la nota, la calificación, el nombre de la asignatura, 
+-- el curso y todos los datos del alumno, por lo que habrá que crear una vista.
 
 -- Creamos la vista
 create view V_CALIFICACIONES as
-select asig.NOMBRE as ASIG_NOMBRE, asig.curso, us.nombre as ALU_NOMBRE, us.apellidos as ALU_APELLIDOS, us.dni, us.pais, us. correo, nf.CALIFICACION, nf.NOTA
+select asig.NOMBRE as ASIG_NOMBRE, asig.curso, us.nombre as ALU_NOMBRE, us.apellidos as ALU_APELLIDOS, 
+us.dni, us.pais, us. correo, nf.CALIFICACION, nf.NOTA
 from NOTAS_FINALES nf
 join USUARIOS us on nf.USUARIOS_ID = us.id
 join ASIGNATURAS asig on nf.ASIGNATURAS_ID = asig.id
 join ROL_US_AS r on r.USUARIOS_ID = us.id and r.ASIGNATURAS_ID = asig.id
 join ROLES on rol = r.ROLES_ROL
 where  nombre = 'estudiante';
+
 -- Damos los permisos
 grant select on V_CALIFICACIONES to R_ADMINISTRATIVO;
 
@@ -50,14 +58,19 @@ grant select on V_CALIFICACIONES to R_ADMINISTRATIVO;
 --6.1. Crear todo tipo de actividades (leer, insertar, modificar o borrar)
 grant connect to R_PROFESOR;
 grant select, insert, alter, delete on ACTIVIDADES to R_PROFESOR;
+
 --6.2. Crear Preguntas (leer, insertar, modificar o borrar)
 grant select, insert, alter, delete on PREGUNTAS to R_PROFESOR;
+
 --6.3. Asignar Usuarios a grupos
 grant select, insert, alter, delete on US_GRUPS to R_PROFESOR;
+
 --6.4. Poner nota y calificación final a un alumno en una asignatura
 grant select, insert, alter, delete on NOTAS_FINALES to R_PROFESOR;
---6.5. Modificar el esquema para que el profesor pueda poner nota a una respuesta de un alumno a una pregunta. Dar los permisos necesarios
--- Damos los permisos--
+
+--6.5. Modificar el esquema para que el profesor pueda poner nota a una respuesta de un alumno a una pregunta. 
+-- Dar los permisos necesarios
+-- En nuestro caso no hace falta modificar el esquema pues el profesor modificará directamente la tabla RESPUESTAS.
 grant select, insert, alter, delete on RESPUESTAS to R_PROFESOR;
 
 --7. Dar permisos a R_ALUMNO para:
@@ -65,7 +78,7 @@ grant select, insert, alter, delete on RESPUESTAS to R_PROFESOR;
 -- Conectado desde CAMPUS
 grant connect to R_ALUMNO;
 
---- Creamos la tabla ORACLE que representa los usuarios de ORACLE. 
+--- Creamos la tabla ORACLE que representa los usuarios de ORACLE. (Ya incluida en el script modelo_relacional.sql)
 CREATE TABLE ORACLE
   (
     id          NUMBER NOT NULL ,
@@ -78,6 +91,7 @@ ALTER TABLE ORACLE ADD CONSTRAINT ORACLE_PK PRIMARY KEY ( id ) ;
 
 -- Antes de crear el procedimiento damos los siguientes permisos a CAMPUS desde SYSTEM:
 grant create, alter, drop user to CAMPUS;
+
 -- Creamos el procedimiento
 create or replace procedure PR_ASIGNA_USUARIO(US_ID IN NUMBER, US_ORACLE IN VARCHAR2, US_ROL IN VARCHAR2) AS
 -- Almacenamos el rol del usuario para darle los permisos correspondientes más tarde.
@@ -115,6 +129,7 @@ join ORACLE ora on ora.USUARIOS_id = us.id
 join ROL_US_AS r on r.USUARIOS_ID = us.id 
 join ROLES on roles.rol = r.ROLES_ROL
 where USER = ora.miuser and roles.nombre='estudiante';
+
 -- damos permiso de ver esos datos
 grant select on V_DATOS_USUARIO to R_ALUMNO;
 
@@ -130,13 +145,16 @@ join PREGUNTAS pre on pre.cuestionarios_id = act.id
 left outer join RESPUESTAS res on res.Preguntas_id = pre.id and res.USUARIOS_ID = us.id
 join ORACLE ora on ora.USUARIOS_id = us.id
 where USER = ora.miuser and roles.nombre='estudiante';
+
 -- damos permisos
 grant select on V_RESULTADO to R_ALUMNO;
 
 
---8. Crear una tabla CONEXIONES con los campos SESIONID, USUARIO, IP, MAQUINA, INICIO, FIN. Crear un trigger de manera que cada vez que un usuario de la base de datos se conecte se almacene en la tabla CONEXIONES su número de sesión, usuario, ip desde donde se conecta, máquina y fecha del sistema. Utilizar la funicón SYS_CONTEXT:
--- Conectado desde CAMPUS
-create table CONEXIONES(
+--8. Crear una tabla CONEXIONES con los campos SESIONID, USUARIO, IP, MAQUINA, INICIO, FIN. Crear un trigger de manera 
+-- que cada vez que un usuario de la base de datos se conecte se almacene en la tabla CONEXIONES su número de sesión, usuario, 
+-- ip desde donde se conecta, máquina y fecha del sistema. Utilizar la funicón SYS_CONTEXT:
+
+create table CONEXIONES( -- (Ya incluida en el script modelo_relacional.sql)
     sesionid     NUMBER NOT NULL PRIMARY KEY,
     usuario      VARCHAR2(50) NOT NULL ,
     ip           VARCHAR2(20),
@@ -145,17 +163,19 @@ create table CONEXIONES(
     fin          DATE
   ) ;
 
--- Conectado desde desde SYS as SYSDBA
+-- Conectado desde SYS as SYSDBA
 CREATE OR REPLACE TRIGGER TR_CONEXIONES
 AFTER LOGON ON DATABASE 
 BEGIN
   INSERT INTO CAMPUS.CONEXIONES (SESIONID, USUARIO, IP, MAQUINA, INICIO)  
-  SELECT SYS_CONTEXT('USERENV','SESSIONID'), SYS_CONTEXT('USERENV','SESSION_USER'), SYS_CONTEXT('USERENV','IP_ADDRESS'), SYS_CONTEXT('USERENV','HOST'), SYSDATE FROM DUAL;
+  SELECT SYS_CONTEXT('USERENV','SESSIONID'), SYS_CONTEXT('USERENV','SESSION_USER'), SYS_CONTEXT('USERENV','IP_ADDRESS'), 
+  SYS_CONTEXT('USERENV','HOST'), SYSDATE FROM DUAL;
 END;
 
 --9. Crear al menos un usuario de cada rol y probar que todo funciona según lo diseñado
+-- *** EJECUTAR EL APARTADO DE INTRODUCCION DE DATOS DEL SCRIPT modelo_relacional.sql SI NO LO HA HECHO TODAVÍA. ***
 
--- Ya tenemos introducidos los siguientes usuarios del CV en la table USUARIOS (ver modelo_relacional.sql):
+-- Ya tenemos introducidos los siguientes usuarios del CV en la tabla USUARIOS:
 EXECUTE PR_ASIGNA_USUARIO(90,'DAVID','2'); -- admnistrativo
 EXECUTE PR_ASIGNA_USUARIO(37,'ALICIA','0'); -- alumna
 EXECUTE PR_ASIGNA_USUARIO(12,'ALBERTO',''); -- alumno
