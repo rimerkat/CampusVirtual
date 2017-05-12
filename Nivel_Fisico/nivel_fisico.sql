@@ -135,7 +135,7 @@ END PR_ASIGNA_USUARIO;
 
 --7.2 Crear los mecanismos necesarios (evalúe las diferentes posibilidades) para que cada alumno sólo pueda ver sus propios datos.
 create or replace view V_DATOS_USUARIO AS
-select us.dni, us.nombre, us.apellidos, us.correo, us.pais from USUARIOS us
+select distinct us.dni, us.nombre, us.apellidos, us.correo, us.pais from USUARIOS us
 join ORACLE ora on ora.USUARIOS_id = us.id
 join ROL_US_AS r on r.USUARIOS_ID = us.id 
 join ROLES on roles.rol = r.ROLES_ROL
@@ -203,5 +203,13 @@ select * from ORACLE;
 -- Comprobamos que no podemos asignar un segundo usuario Oracle a un usuario del CV :
 EXECUTE PR_ASIGNA_USUARIO(12,'ALBERTO2','');
 
+-- Ahora creamos una nueva conexión para un nuevo alumno p.e. ALICIA y nos conectamos de ese usuario :
+-- ¡¡ CUIDADO LOS NOMBRES DE USUARIOS Y LAS CONTRASEÑAS ESTÁN EN MAYÚSCULAS !!   
+--    CONTRASEÑA ES IGUAL QUE EL NOMBRE DE USUARIO (p.e. user = ALICIA, pass = ALICIA)
+
+-- Comprobamos que sólo se puede ver los datos del alumno mismo:
+select * from CAMPUS.V_DATOS_USUARIO;
+
+-- 
 
 
