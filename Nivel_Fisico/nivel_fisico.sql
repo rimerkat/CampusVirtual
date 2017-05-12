@@ -1,9 +1,9 @@
 -- CAMPUS VIRTUAL. NIVEL FISICO. 
 -- Grupo MATRIX: 
+--  Nadia Carrera Chahir,  
 --  María Castro Martínez, 
---  Nadia Carrera Chahir, 
---  Joaquín Terrasa Moya, 
---  Rime Raissouni.
+--  Rime Raissouni,
+--  Joaquín Terrasa Moya.
 
 --1. Crear un espacio de tablas denominado TS_CAMPUS
 create tablespace TS_CAMPUS datafile 'tscampus.dbf' size 10M autoextend on;
@@ -153,11 +153,19 @@ END;
 
 --9. Crear al menos un usuario de cada rol y probar que todo funciona según lo diseñado
 
+-- Ya tenemos introducidos los siguientes usuarios del CV en la table USUARIOS (ver modelo_relacional.sql):
 EXECUTE PR_ASIGNA_USUARIO(90,'DAVID'); -- admnistrativo
-EXECUTE PR_ASIGNA_USUARIO(37,'ALICIA'); -- alumna
-EXECUTE PR_ASIGNA_USUARIO(12,'ALBERTO'); -- alumno
+EXECUTE PR_ASIGNA_USUARIO(37,'ALICIA','0'); -- alumna
+EXECUTE PR_ASIGNA_USUARIO(12,'ALBERTO','0'); -- alumno
 EXECUTE PR_ASIGNA_USUARIO(89,'RAM'); -- profesor
 
---- SENTENCIAS PARA TESTING
+-- Ahora comprobamos que se han creado los usuarios ORACLE:
+select * from ALL_USERS;
+-- Podemos ver también que se han asignado a sus correspondientes usuarios del CV:
+select * from ORACLE;
+
+-- Comprobamos que no podemos asignar un segundo usuario Oracle a un usuario del CV :
+EXECUTE PR_ASIGNA_USUARIO(12,'ALBERTO2');
+
 
 
