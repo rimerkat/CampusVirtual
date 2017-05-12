@@ -5,6 +5,8 @@
 --  Rime Raissouni,
 --  Joaquín Terrasa Moya.
 
+-- *** EJECUTAR LAS SENTENCIAS SIN COMENTARIOS. EN ALGUNAS MÁQUINAS CAUSA ERROR DE COMPILACIÓN. ***
+
 --1. Crear un espacio de tablas denominado TS_CAMPUS
 create tablespace TS_CAMPUS datafile 'tscampus.dbf' size 10M autoextend on;
 
@@ -156,8 +158,8 @@ END;
 -- Ya tenemos introducidos los siguientes usuarios del CV en la table USUARIOS (ver modelo_relacional.sql):
 EXECUTE PR_ASIGNA_USUARIO(90,'DAVID','2'); -- admnistrativo
 EXECUTE PR_ASIGNA_USUARIO(37,'ALICIA','0'); -- alumna
-EXECUTE PR_ASIGNA_USUARIO(12,'ALBERTO'); -- alumno
-EXECUTE PR_ASIGNA_USUARIO(89,'RAM'); -- profesor
+EXECUTE PR_ASIGNA_USUARIO(12,'ALBERTO',''); -- alumno
+EXECUTE PR_ASIGNA_USUARIO(89,'RAM',''); -- profesor
 
 -- Ahora comprobamos que se han creado los usuarios ORACLE:
 select * from ALL_USERS;
@@ -165,7 +167,7 @@ select * from ALL_USERS;
 select * from ORACLE;
 
 -- Comprobamos que no podemos asignar un segundo usuario Oracle a un usuario del CV :
-EXECUTE PR_ASIGNA_USUARIO(12,'ALBERTO2');
+EXECUTE PR_ASIGNA_USUARIO(12,'ALBERTO2','');
 
 
 
