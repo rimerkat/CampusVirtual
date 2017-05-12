@@ -1,8 +1,8 @@
 -- CAMPUS VIRTUAL. NIVEL FISICO. 
 -- Grupo MATRIX: 
---  María , 
+--  María Castro Martínez, 
 --  Nadia Carrera Chahir, 
---  Joaquín, 
+--  Joaquín Terrasa Moya, 
 --  Rime Raissouni.
 
 --1. Crear un espacio de tablas denominado TS_CAMPUS
@@ -64,9 +64,15 @@ grant select, insert, alter, delete on RESPUESTAS to R_PROFESOR;
 grant connect to R_ALUMNO;
 
 --- Creamos la tabla ORACLE que representa los usuarios de ORACLE. 
-create table ORACLE (id number not null primary key, miuser varchar2(30) not null, pass varchar2(30) not null) ;
-alter table ORACLE add USUARIOS_id Number;
-ALTER TABLE ORACLE ADD CONSTRAINT ORACLE_USUARIOS_FK FOREIGN KEY ( USUARIOS_id ) REFERENCES USUARIOS ( id ) ;
+CREATE TABLE ORACLE
+  (
+    id          NUMBER NOT NULL ,
+    miuser      VARCHAR2 (30) NOT NULL ,
+    pass        VARCHAR2 (30) NOT NULL ,
+    USUARIOS_id NUMBER NOT NULL
+  ) ;
+CREATE UNIQUE INDEX ORACLE__IDX ON ORACLE ( USUARIOS_id ASC ) ;
+ALTER TABLE ORACLE ADD CONSTRAINT ORACLE_PK PRIMARY KEY ( id ) ;
 
 -- Antes de crear el procedimiento damos los siguientes permisos a CAMPUS desde SYSTEM:
 grant create, alter, drop user to CAMPUS;
@@ -75,6 +81,10 @@ create or replace procedure PR_ASIGNA_USUARIO(US_ID IN NUMBER, US_ORACLE IN VARC
 -- Almacenamos el rol del usuario para darle los permisos correspondientes más tarde.
   ROL VARCHAR2(2);
 BEGIN
+  -- Si el usuario US_ID ya tiene asignado un usuario ORACLE, no hacer nada más que avisarlo.
+  IF 
+
+
 -- Si el parámetro US_ROL no se especifica, se busca en los datos de la tabla USUARIOS.
   IF US_ROL != '' THEN ROL := US_ROL;
   ELSE  
@@ -83,7 +93,7 @@ BEGIN
   END IF;
   -- Creamos su correspondiente usuario oracle y lo relacionamos con la tabla USUARIOS
   EXECUTE IMMEDIATE 'create user '|| US_ORACLE || ' identified by '|| US_ORACLE ||' default tablespace TS_CAMPUS quota 10M on TS_CAMPUS';
-  INSERT INTO ORACLE VALUES (US_ID||''||to_char(DBMS_RANDOM.value(10,999)), US_ORACLE, US_ORACLE, US_ID);
+  INSERT INTO ORACLE VALUES (US_ID||''||to_char(trunc(DBMS_RANDOM.value(10,999))), US_ORACLE, US_ORACLE, US_ID);
   -- Damos los permisos correspondientes
   IF ROL = '0' THEN --estudiante
     EXECUTE IMMEDIATE 'grant R_ALUMNO TO '||US_ORACLE;
@@ -91,7 +101,8 @@ BEGIN
     EXECUTE IMMEDIATE 'grant R_PROFESOR TO '||US_ORACLE;
   ELSE --administrativo
     EXECUTE IMMEDIATE 'grant R_ADMINISTRATIVO TO '||US_ORACLE;
-  END IF;
+  END IF; 
+  END IF; -- IF EXTERNO
 END PR_ASIGNA_USUARIO;
 
 --7.2 Crear los mecanismos necesarios (evalúe las diferentes posibilidades) para que cada alumno sólo pueda ver sus propios datos.
