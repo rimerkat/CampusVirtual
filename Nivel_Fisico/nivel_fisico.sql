@@ -215,5 +215,9 @@ select * from CAMPUS.V_RESULTADO;
 -- Intentamos insertar una respuesta desde el usuario ALICIA:
  update CAMPUS.V_RESULTADO set RESPUESTA = 'respuesta Alicia' where ACT_ID = 1 and PREG_ID = 1; -- por ahora no deja hacerlo. hay que corregir algo de la vista
 
+-- Nos conectamos como usuario RAM (es profesor) para comprobar que se conecta bien
 
+-- Nos conectamos como usuario DAVID (es administrativo)
+-- Comprobamos que puede consultar las calificaciones de los alumnos:
+select * from V_CALIFICACIONES;
 
