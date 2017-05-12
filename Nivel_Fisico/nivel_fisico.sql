@@ -19,7 +19,7 @@ create tablespace TS_CAMPUS datafile 'tscampus.dbf' size 10M autoextend on;
 -- Conectado como SYSTEM:
 create user CAMPUS identified by campus default tablespace TS_CAMPUS quota 100M on TS_CAMPUS;
 --Hacemos connect con admin option para poder crear usuarios dentro de CAMPUS (se necesita más adelante)
-grant connect with admin option;
+grant connect to CAMPUS with admin option;
 grant create table, create view, create procedure to CAMPUS;
 -- Tambien le damos permiso para crear y borrar usuarios (se necesita más adelante).
 grant create user to CAMPUS;
@@ -39,7 +39,7 @@ create role R_ADMINISTRATIVO;
 
 --5. Dar permisos al R_ADMINISTRATIVO para:
 --5.1. Seleccionar, insertar, modificar o borrar en la tabla de usuarios
-grant connect to R_ADMINISTRATIVO;
+grant connect to R_ADMINISTRATIVO with admin option;
 grant select, insert, alter, delete on USUARIOS to R_ADMINISTRATIVO;
 
 --5.2. Seleccionar, insertar, modificar o borrar de la tabla de asignaturas
