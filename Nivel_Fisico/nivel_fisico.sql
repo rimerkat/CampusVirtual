@@ -123,7 +123,7 @@ BEGIN
     EXECUTE IMMEDIATE 'grant R_ALUMNO TO '||US_ORACLE;
   ELSIF ROL = '1' THEN --profesor
     EXECUTE IMMEDIATE 'grant R_PROFESOR TO '||US_ORACLE;
-  ELSE --administrativo
+  ELSIF ROL = '2' THEN --administrativo
     EXECUTE IMMEDIATE 'grant R_ADMINISTRATIVO TO '||US_ORACLE;
   END IF; 
 
