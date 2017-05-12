@@ -340,5 +340,10 @@ INSERT INTO ROL_US_AS VALUES ('2', 411, 90);
 INSERT INTO ROL_US_AS VALUES ('2', 412, 90);
 INSERT INTO ROL_US_AS VALUES ('2', 413, 90);
 INSERT INTO ROL_US_AS VALUES ('2', 421, 90);
+INSERT INTO ACTIVIDADES(id,asignaturas_id,nombre) VALUES (1, 421, 'ACTIV1');
+INSERT INTO ACTIVIDADES(id,asignaturas_id,nombre) VALUES (2, 413, 'ACTIV1');
+INSERT INTO CUESTIONARIOS VALUES (1, sysdate, sysdate+3);
+INSERT INTO PREGUNTAS VALUES (1, 'PREGUNTA 1: blabla', 1);
+INSERT INTO PREGUNTAS VALUES (2, 'PREGUNTA 2: bla..', 1);
 
 ------------------------------------------------------- FIN ----------------------------------------------------------------------
