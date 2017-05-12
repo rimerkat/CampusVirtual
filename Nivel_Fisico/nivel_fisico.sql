@@ -69,6 +69,10 @@ grant select on V_CALIFICACIONES to R_ADMINISTRATIVO;
 --6.1. Crear todo tipo de actividades (leer, insertar, modificar o borrar)
 grant connect to R_PROFESOR;
 grant select, insert, alter, delete on ACTIVIDADES to R_PROFESOR;
+grant select, insert, alter, delete on CUESTIONARIOS to R_PROFESOR;
+grant select, insert, alter, delete on FOROS to R_PROFESOR;
+grant select, insert, alter, delete on TAREAS to R_PROFESOR;
+grant select, insert, alter, delete on DIARIO to R_PROFESOR;
 
 --6.2. Crear Preguntas (leer, insertar, modificar o borrar)
 grant select, insert, alter, delete on PREGUNTAS to R_PROFESOR;
@@ -204,20 +208,32 @@ select * from ORACLE;
 -- Comprobamos que no podemos asignar un segundo usuario Oracle a un usuario del CV :
 EXECUTE PR_ASIGNA_USUARIO(12,'ALBERTO2','');
 
--- Ahora creamos una nueva conexión para un nuevo alumno p.e. ALICIA y nos conectamos de ese usuario :
+-- Ahora creamos una nueva conexión para un nuevo alumno p.e. RAM y nos conectamos de ese usuario :
 -- ¡¡ CUIDADO LOS NOMBRES DE USUARIOS Y LAS CONTRASEÑAS ESTÁN EN MAYÚSCULAS !!   
---    CONTRASEÑA ES IGUAL QUE EL NOMBRE DE USUARIO (p.e. user = ALICIA, pass = ALICIA)
+--    CONTRASEÑA ES IGUAL QUE EL NOMBRE DE USUARIO (p.e. user = RAM, pass = RAM)
 
--- Comprobamos que sólo se puede ver los datos del alumno mismo:
+-- Nos conectamos como usuario RAM (es profesor) para comprobar que se conecta bien 
+-- Comprobamos que puede crear actividades y preguntas..:
+INSERT INTO ACTIVIDADES(id,asignaturas_id,nombre) VALUES (1, 421, 'ACTIV1');
+INSERT INTO ACTIVIDADES(id,asignaturas_id,nombre) VALUES (2, 413, 'ACTIV1');
+INSERT INTO CUESTIONARIOS VALUES (1, sysdate, sysdate+3);
+INSERT INTO PREGUNTAS VALUES (1, 'PREGUNTA 1: blabla', 1);
+INSERT INTO PREGUNTAS VALUES (2, 'PREGUNTA 2: bla..', 1);
+
+-- Nos conectamos como usuario ALICIA (es alumna) 
+-- Comprobamos que sólo se puede ver sus propios datos 
 select * from CAMPUS.V_DATOS_USUARIO;
 select * from CAMPUS.V_RESULTADO;
 
 -- Intentamos insertar una respuesta desde el usuario ALICIA:
  update CAMPUS.V_RESULTADO set RESPUESTA = 'respuesta Alicia' where ACT_ID = 1 and PREG_ID = 1; -- por ahora no deja hacerlo. hay que corregir algo de la vista
 
--- Nos conectamos como usuario RAM (es profesor) para comprobar que se conecta bien
-
 -- Nos conectamos como usuario DAVID (es administrativo)
+-- Comprobamos que puede crear, modificar ..etc usuarios, asignaturas y matriculas:
+INSERT INTO USUARIOS VALUES (02, 'C855510', 'Marta','Salva Gómez','martagz@gmail.com','españa',''); 
+INSERT INTO ASIGNATURAS VALUES (300, '2015/16', 'Legislaciones','A','1');
+INSERT INTO ROL_US_AS VALUES ('1', 300, 02);
+
 -- Comprobamos que puede consultar las calificaciones de los alumnos:
 select * from V_CALIFICACIONES;
 
