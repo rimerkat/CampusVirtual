@@ -3,8 +3,15 @@
 --   sitio:      Oracle Database 11g
 --   tipo:      Oracle Database 11g
 
--- TODO EL SCRIPT SE EJECUTA DEL USUARIO CAMPUS
--- SCRIPT FINAL (INCLUYENDO LAS MODIFICACIONES SOLICITADAS EN LA TAREA NIVEL FISICO + DATOS INTRODUCIDOS)
+-- *** TODO EL SCRIPT SE EJECUTA DESDE EL USUARIO CAMPUS ***
+
+-- *** SE PUEDE EJECUTAR TODO DE UNA VEZ O BIEN POR APARTADOS :
+--     APARTADO 1:  PREGUNTA 3 DEL ENUNCIADO nivel_fisico.sql
+--     APARTADO 2:  PREGUNTA 7.1 " " 
+--     APARTADO 4:  PREGUNTA 8 " "
+--     APARTADO 4:  INTRODUCCIÓN DE DATOS EN LAS TABLAS ***
+
+------------------------------------------------- APARTADO 1 -----------------------------------------------------------
 
 CREATE TABLE ACTIVIDADES
   (
@@ -271,7 +278,8 @@ ALTER TABLE TAREAS ADD CONSTRAINT TAREAS_ACTIVIDADES_FK FOREIGN KEY ( id ) REFER
 
 ALTER TABLE TITULACIONES ADD CONSTRAINT TITULACIONES_CENTROS_FK FOREIGN KEY ( CENTROS_id ) REFERENCES CENTROS ( id ) ;
 
--- MODIFICACIONES DE LA TAREA NIVEL FISICO
+
+-------------------------------------------------- APARTADO 2 -----------------------------------------------------------
 
 CREATE TABLE ORACLE
   (
@@ -283,6 +291,8 @@ CREATE TABLE ORACLE
 CREATE UNIQUE INDEX ORACLE__IDX ON ORACLE ( USUARIOS_id ASC ) ;
 ALTER TABLE ORACLE ADD CONSTRAINT ORACLE_PK PRIMARY KEY ( id ) ;
 
+-------------------------------------------------- APARTADO 3 -----------------------------------------------------------
+
 CREATE TABLE CONEXIONES(
     sesionid     NUMBER NOT NULL PRIMARY KEY,
     usuario      VARCHAR2(50) NOT NULL ,
@@ -293,7 +303,7 @@ CREATE TABLE CONEXIONES(
   ) ;
 
 -----------------------------------------------------------------------------------------------------------------------------
------------------------------------------------ INTRODUCCION DE DATOS -------------------------------------------------------
+------------------------------------------ APARTADO 4 : INTRODUCCIÓN DE DATOS -----------------------------------------------
 -----------------------------------------------------------------------------------------------------------------------------
 
 INSERT INTO USUARIOS VALUES (12, 'U454655', 'Alberto','Jimenez Alvarez','ajalvarez@gmail.com','españa',''); 
@@ -331,8 +341,6 @@ INSERT INTO ROL_US_AS VALUES ('2', 412, 90);
 INSERT INTO ROL_US_AS VALUES ('2', 413, 90);
 INSERT INTO ROL_US_AS VALUES ('2', 421, 90);
 
-
--- ************************ HASTA AQUI SE EJECUTA *********************
 
 -- Informe de Resumen de Oracle SQL Developer Data Modeler: 
 -- 
