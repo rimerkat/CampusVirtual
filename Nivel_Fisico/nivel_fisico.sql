@@ -81,10 +81,7 @@ create or replace procedure PR_ASIGNA_USUARIO(US_ID IN NUMBER, US_ORACLE IN VARC
 -- Almacenamos el rol del usuario para darle los permisos correspondientes más tarde.
   ROL VARCHAR2(2);
 BEGIN
-  -- Si el usuario US_ID ya tiene asignado un usuario ORACLE, no hacer nada más que avisarlo.
-  IF 
-
-
+  -- Si el usuario US_ID ya tiene asignado un usuario ORACLE, se lanza un error porque sólo puede haber un usuario Oracle por usuario de CV.
 -- Si el parámetro US_ROL no se especifica, se busca en los datos de la tabla USUARIOS.
   IF US_ROL != '' THEN ROL := US_ROL;
   ELSE  
@@ -102,7 +99,11 @@ BEGIN
   ELSE --administrativo
     EXECUTE IMMEDIATE 'grant R_ADMINISTRATIVO TO '||US_ORACLE;
   END IF; 
-  END IF; -- IF EXTERNO
+
+EXCEPTION
+  WHEN OTHERS THEN 
+    DBMS_OUTPUT.PUT_LINE(SQLCODE||' error: '||SQLERRM);
+
 END PR_ASIGNA_USUARIO;
 
 --7.2 Crear los mecanismos necesarios (evalúe las diferentes posibilidades) para que cada alumno sólo pueda ver sus propios datos.
