@@ -7,18 +7,29 @@
 
 -- *** EJECUTAR LAS SENTENCIAS SIN COMENTARIOS. EN ALGUNAS MÁQUINAS CAUSA ERROR DE COMPILACIÓN. ***
 
+-- *** SI NO SE INDICA LO CONTRARIO, EJECUTAR TODAS LAS SENTENCIAS DESDE EL USUARIO CAMPUS ***
+
 --1. Crear un espacio de tablas denominado TS_CAMPUS
+-- Conectado como SYSTEM
 create tablespace TS_CAMPUS datafile 'tscampus.dbf' size 10M autoextend on;
 
 --2. Crear un usuario denominado CAMPUS con el esquema correspondiente. Darle cuota en TS_CAMPUS y permiso para conectarse, 
 -- crear tablas, crear vistas, crear procedimientos. Asignarle TS_CAMPUS como TABLESPACE por defecto.
-create user CAMPUS identified by campus default tablespace TS_CAMPUS quota 100M on TS_CAMPUS;
 
---hacemos connect con admin option para poder crear usuarios dentro de CAMPUS (se necesita más adelante)
+-- Conectado como SYSTEM:
+create user CAMPUS identified by campus default tablespace TS_CAMPUS quota 100M on TS_CAMPUS;
+--Hacemos connect con admin option para poder crear usuarios dentro de CAMPUS (se necesita más adelante)
 grant connect with admin option;
 grant create table, create view, create procedure to CAMPUS;
+-- Tambien le damos permiso para crear y borrar usuarios (se necesita más adelante).
+grant create user to CAMPUS;
+grant alter user to CAMPUS;
+grant update user to CAMPUS;
+grant drop user to CAMPUS;
 
 --3. Conectarse como CAMPUS y ejecutar el script para crear las tablas.
+
+-- Conectado como CAMPUS:
 -- Ejecutar script modelo_relacional.sql 
 
 --4. Crear Roles R_PROFESOR, R_ALUMNO, R_ADMINISTRATIVO
@@ -37,8 +48,8 @@ grant select, insert, alter, delete on ASIGNATURAS to R_ADMINISTRATIVO;
 --5.3. Matricular a un alumno en una asignatura. Borrar o modificar la matrícula.
 grant select, insert, alter, delete on Rol_Us_As to R_ADMINISTRATIVO;
 
---5.4. Leer la calificación final de los alumnos. Realmente se debe poder leer la nota, la calificación, el nombre de la asignatura, 
--- el curso y todos los datos del alumno, por lo que habrá que crear una vista.
+--5.4. Leer la calificación final de los alumnos. Realmente se debe poder leer la nota, la calificación, 
+-- el nombre de la asignatura, el curso y todos los datos del alumno, por lo que habrá que crear una vista.
 
 -- Creamos la vista
 create view V_CALIFICACIONES as
@@ -74,8 +85,9 @@ grant select, insert, alter, delete on NOTAS_FINALES to R_PROFESOR;
 grant select, insert, alter, delete on RESPUESTAS to R_PROFESOR;
 
 --7. Dar permisos a R_ALUMNO para:
---7.1 Conectarse. Hay que modificar el esquema para que cada usuario tenga un USUARIO de Oracle con el que se conecte. Crear un procedimiento almacenado que a cada usuario de la tabla USUARIOS le asigne un usuario de Oracle y una palabra de paso. El procedimiento también asignará los permisos necesarios al usuario.
--- Conectado desde CAMPUS
+--7.1 Conectarse. Hay que modificar el esquema para que cada usuario tenga un USUARIO de Oracle con el que se conecte. 
+-- Crear un procedimiento almacenado que a cada usuario de la tabla USUARIOS le asigne un usuario de Oracle y una palabra de paso. 
+-- El procedimiento también asignará los permisos necesarios al usuario.
 grant connect to R_ALUMNO;
 
 --- Creamos la tabla ORACLE que representa los usuarios de ORACLE. (Ya incluida en el script modelo_relacional.sql)
@@ -89,15 +101,13 @@ CREATE TABLE ORACLE
 CREATE UNIQUE INDEX ORACLE__IDX ON ORACLE ( USUARIOS_id ASC ) ;
 ALTER TABLE ORACLE ADD CONSTRAINT ORACLE_PK PRIMARY KEY ( id ) ;
 
--- Antes de crear el procedimiento damos los siguientes permisos a CAMPUS desde SYSTEM:
-grant create, alter, drop user to CAMPUS;
-
 -- Creamos el procedimiento
 create or replace procedure PR_ASIGNA_USUARIO(US_ID IN NUMBER, US_ORACLE IN VARCHAR2, US_ROL IN VARCHAR2) AS
 -- Almacenamos el rol del usuario para darle los permisos correspondientes más tarde.
   ROL VARCHAR2(2);
 BEGIN
-  -- Si el usuario US_ID ya tiene asignado un usuario ORACLE, se lanza un error porque sólo puede haber un usuario Oracle por usuario de CV.
+  -- Si el usuario US_ID ya tiene asignado un usuario ORACLE, se lanza un error porque sólo puede haber un usuario Oracle 
+  -- por usuario de CV.
 -- Si el parámetro US_ROL no se especifica, se busca en los datos de la tabla USUARIOS.
   IF US_ROL != '' THEN ROL := US_ROL;
   ELSE  
@@ -106,7 +116,8 @@ BEGIN
   END IF;
   -- Creamos su correspondiente usuario oracle y lo relacionamos con la tabla USUARIOS
   INSERT INTO ORACLE VALUES (US_ID||''||to_char(trunc(DBMS_RANDOM.value(10,999))), US_ORACLE, US_ORACLE, US_ID);
-  EXECUTE IMMEDIATE 'create user '|| US_ORACLE || ' identified by '|| US_ORACLE ||' default tablespace TS_CAMPUS quota 10M on TS_CAMPUS';
+  EXECUTE IMMEDIATE 'create user '|| US_ORACLE || ' identified by '|| US_ORACLE 
+  ||' default tablespace TS_CAMPUS quota 10M on TS_CAMPUS';
   -- Damos los permisos correspondientes
   IF ROL = '0' THEN --estudiante
     EXECUTE IMMEDIATE 'grant R_ALUMNO TO '||US_ORACLE;
@@ -133,7 +144,9 @@ where USER = ora.miuser and roles.nombre='estudiante';
 -- damos permiso de ver esos datos
 grant select on V_DATOS_USUARIO to R_ALUMNO;
 
---7.3 Dar permiso para Insertar en la vista V_RESULTADO (hay que crearla). Es la vista en la que el alumno guarda la respuesta a una pregunta. Deberá contener datos del alumno, la pregunta y la respuesta. Obviamente un alumno no puede contestar por otro, por lo que habrá que validar el usuario.
+--7.3 Dar permiso para Insertar en la vista V_RESULTADO (hay que crearla). Es la vista en la que el alumno guarda la respuesta 
+-- a una pregunta. Deberá contener datos del alumno, la pregunta y la respuesta. Obviamente un alumno no puede contestar por otro, 
+-- por lo que habrá que validar el usuario.
 create or replace view V_RESULTADO as
 select us.nombre as ALU_NOMBRE, us.apellidos as ALU_APELLIDOS, us.dni, us.pais, us.correo, asig.nombre as ASIG_NOMBRE, act.nombre as ACT_NOMBRE, pre.pregunta, res.respuesta
 from USUARIOS us 
@@ -163,7 +176,7 @@ create table CONEXIONES( -- (Ya incluida en el script modelo_relacional.sql)
     fin          DATE
   ) ;
 
--- Conectado desde SYS as SYSDBA
+-- Conectado desde SYS as SYSDBA:
 CREATE OR REPLACE TRIGGER TR_CONEXIONES
 AFTER LOGON ON DATABASE 
 BEGIN
@@ -173,6 +186,7 @@ BEGIN
 END;
 
 --9. Crear al menos un usuario de cada rol y probar que todo funciona según lo diseñado
+-- Conectado como CAMPUS:
 -- *** EJECUTAR EL APARTADO DE INTRODUCCION DE DATOS DEL SCRIPT modelo_relacional.sql SI NO LO HA HECHO TODAVÍA. ***
 
 -- Ya tenemos introducidos los siguientes usuarios del CV en la tabla USUARIOS:
