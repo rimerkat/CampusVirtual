@@ -160,7 +160,7 @@ join ORACLE ora on ora.USUARIOS_id = us.id
 where USER = ora.miuser and roles.nombre='estudiante';
 
 -- damos permisos
-grant select on V_RESULTADO to R_ALUMNO;
+grant select, insert, update on V_RESULTADO to R_ALUMNO;
 
 
 --8. Crear una tabla CONEXIONES con los campos SESIONID, USUARIO, IP, MAQUINA, INICIO, FIN. Crear un trigger de manera 
@@ -209,6 +209,7 @@ EXECUTE PR_ASIGNA_USUARIO(12,'ALBERTO2','');
 
 -- Comprobamos que sólo se puede ver los datos del alumno mismo:
 select * from CAMPUS.V_DATOS_USUARIO;
+select * from V_RESULTADO;
 
 -- 
 
