@@ -292,7 +292,9 @@ CREATE TABLE CONEXIONES(
     fin          DATE
   ) ;
 
--- INTRODUCCION DE DATOS
+-----------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------- INTRODUCCION DE DATOS -------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------
 
 INSERT INTO USUARIOS VALUES (12, 'U454655', 'Alberto','Jimenez Alvarez','ajalvarez@gmail.com','españa',''); 
 INSERT INTO USUARIOS VALUES (21, 'H789565', 'Juan','Fraud Mango','jfmango@gmail.com','españa',''); 
