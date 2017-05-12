@@ -148,7 +148,8 @@ grant select on V_DATOS_USUARIO to R_ALUMNO;
 -- a una pregunta. Deberá contener datos del alumno, la pregunta y la respuesta. Obviamente un alumno no puede contestar por otro, 
 -- por lo que habrá que validar el usuario.
 create or replace view V_RESULTADO as
-select us.nombre as ALU_NOMBRE, us.apellidos as ALU_APELLIDOS, us.dni, us.pais, us.correo, asig.nombre as ASIG_NOMBRE, act.nombre as ACT_NOMBRE, pre.pregunta, res.respuesta
+select us.nombre as ALU_NOMBRE, us.apellidos as ALU_APELLIDOS, us.dni, us.pais, us.correo, asig.nombre as ASIG_NOMBRE,
+act.id as ACT_ID, act.nombre as ACT_NOMBRE, pre.id as PREG_ID, pre.pregunta, res.respuesta
 from USUARIOS us 
 join ROL_US_AS r on r.USUARIOS_ID = us.id 
 join ASIGNATURAS asig on r.ASIGNATURAS_ID = asig.id
@@ -209,8 +210,10 @@ EXECUTE PR_ASIGNA_USUARIO(12,'ALBERTO2','');
 
 -- Comprobamos que sólo se puede ver los datos del alumno mismo:
 select * from CAMPUS.V_DATOS_USUARIO;
-select * from V_RESULTADO;
+select * from CAMPUS.V_RESULTADO;
 
--- 
+-- Intentamos insertar una respuesta desde el usuario ALICIA:
+ update CAMPUS.V_RESULTADO set RESPUESTA = 'respuesta Alicia' where ACT_ID = 1 and PREG_ID = 1; -- por ahora no deja hacerlo. hay que corregir algo de la vista
+
 
 
