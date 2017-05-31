@@ -7,42 +7,20 @@
 -- código de asignatura, nombre de asignatura, curso académico, nota y calificación final. 
 
 -- (1.1) Debemos añadir el atributo fecha en la tabla NOTAS_FINALES para poder poner la fecha de la convocatoria:
-alter table NOTAS_FINALES add Fecha DATE;
+alter table NOTAS_FINALES add Fecha DATE NOT NULL;
+-- (1.2) Y añadir el atributo expediente del alumno para el apartado 2.1:
+alter table USUARIOS add expediente varchar2(20);
 
--- (1.2) Creamos la tabla HISTORICO como indicado:
-CREATE TABLE HISTORICO
-	(
-	Nombre VARCHAR2(20), Apellidos VARCHAR2(40), Dni VARCHAR2(10),
-	Expediente VARCHAR2(20), UsuarioOracle varchar2(20), CodigoAsignatura VARCHAR(20),
-	NombreAsignatura VARCHAR2(30), Curso VARCHAR2(10), Nota NUMBER, Calificacion VARCHAR2(10),
-	CONSTRAINT dni_pk PRIMARY KEY (Dni));
+-- (1.3) Creamos la tabla HISTORICO como indicado:
+CREATE TABLE HISTORICO (
+	dni VARCHAR2(10) NOT NULL PRIMARY KEY,
+	nombre VARCHAR2(20) NOT NULL, apellidos VARCHAR2(40) NOT NULL, 
+	expediente VARCHAR2(20) NOT NULL, usuarioOracle varchar2(20), 
+	codigoAsignatura VARCHAR(20) NOT NULL, nombreAsignatura VARCHAR2(30) NOT NULL, 
+	curso VARCHAR2(10) NOT NULL, nota NUMBER NOT NULL, calificacion VARCHAR2(10) NOT NULL  );
   
 -- (2)
 -- Realizar un JOB que se ejecute todos los años el día 15 de octubre y que almacene todos los datos en la tabla HISTORICO.
---- (2.1) creamos el procedimiento que almacena los datos en la tabla HISTORICO:
-CREATE OR REPLACE PROCEDURE upload_job AS  
-BEGIN
-  SELECT ... INTO ... FROM ...;
- delete from (select * from MENSAJES_BORRADOS); END;
-
-EXCEPTION 
-  WHEN OTHERS THEN -- captura todo tipo de error
-      INSERT INTO errores VALUES (Expediente, CodigoAsignatura, 'Error number ' || SQLCODE || ' : ' || SQLERRM);
-END;
-END upload_job;
-
--- (2.2) Creamos el job:
-BEGIN
-    DBMS_SCHEDULER.CREATE_JOB (
-      job_name => 'septiembre_job',
-      job_type => 'STORED_PROCEDURE', -- usaremos el procedimiento anteriormente creado
-      repeat_interval => 'FREQ=YEARLY; BYMONTH=OCT; BYMONTHDAY=15', --cada 15 octubre, de cada año
-      job_action => 'upload_job',
-      -- start_date => SYSDATE, -- no es necesario, se ejecuta cuando 'repeat_interval'
-      enabled => TRUE,
-      comments => 'Se ejecuta todos los años el día 15 de octubre y almacena todos los datos en la tabla HISTORICO');
-    -- DBMS_SCHEDULER.SET_ATTRIBUTE ('septiembre_job', 'max_runs', 100); -- ejecuta el JOB hasta 100 veces
-END;
 
 -- (3)
 -- (3.1) Si se produjera algún error, debe capturarse, para asegurarnos de que la copia se realiza con los demás alumnos y asignaturas. 
@@ -54,6 +32,44 @@ CREATE TABLE ERRORES (Expediente VARCHAR2(20), CodigoAsignatura VARCHAR2(20), Er
 -- de las tablas correspondientes.
 -- NOTA: Para probarlo se puede disparar el JOB cada minuto y luego cambiar su frecuencia.
 
+--- (2.1) creamos el procedimiento que almacena los datos en la tabla HISTORICO:
+CREATE OR REPLACE PROCEDURE PR_UPLOAD_JOB AS  
+	CURSOR C_ASIGNATURA AS
+	SELECT asi.id, asi.nombre, asi.curso, us.nombre, us.apellidos, us.dni, nf.nota, nf.calificacion, us.expediente, orc.miuser
+	FROM ASIGNATURAS asi
+	JOIN NOTAS_FINALES nf on nf.asignaturas_id = asi.id 
+	JOIN USUARIOS us on nf.usuarios_id = us.id
+	JOIN ORACLE orc on orc.usuarios_id = us.id
+	WHERE extract(month from nf.fecha) = '9'
+	ORDER BY asi.id;
+BEGIN
+	FOR VAR_ALUMNO IN C_ASIGNATURA LOOP -- Por cada alumno matriculado en una asignatura determinada, 
+	-- Introducimos los datos correspondientes y su nota final
+  		INSERT INTO HISTORICO VALUES(VAR_ALUMNO.nombre, VAR_ALUMNO.apellidos, VAR_ALUMNO.dni, VAR_ALUMNO.expediente, 
+					     VAR_ALUMNO.usuarioOracle, VAR_ALUMNO.codigoAsignatura, VAR_ALUMNO.nombreAsignatura, 
+					     VAR_ALUMNO.curso, VAR_ALUMNO.nota, VAR_ALUMNO.calificacion);
+	END LOOP;
+EXCEPTION 
+  WHEN OTHERS THEN -- captura todo tipo de error
+      INSERT INTO errores VALUES (Expediente, CodigoAsignatura, 'Error number ' || SQLCODE || ' : ' || SQLERRM);
+END;
+END PR_UPLOAD_JOB;
+
+-- (2.2) Creamos el job:
+BEGIN
+    DBMS_SCHEDULER.CREATE_JOB (
+      job_name => 'septiembre_job',
+      job_type => 'STORED_PROCEDURE', -- usaremos el procedimiento anteriormente creado
+      repeat_interval => 'FREQ=YEARLY; BYMONTH=OCT; BYMONTHDAY=15', --cada 15 octubre, de cada año
+      job_action => 'PR_UPLOAD_JOB',
+      -- start_date => SYSDATE, -- no es necesario, se ejecuta cuando 'repeat_interval'
+      enabled => TRUE,
+      comments => 'Se ejecuta todos los años el día 15 de octubre y almacena todos los datos en la tabla HISTORICO');
+    -- DBMS_SCHEDULER.SET_ATTRIBUTE ('septiembre_job', 'max_runs', 100); -- ejecuta el JOB hasta 100 veces
+END;
+
+
+
 
 -- AUDITORIA
 
@@ -62,5 +78,10 @@ CREATE TABLE ERRORES (Expediente VARCHAR2(20), CodigoAsignatura VARCHAR2(20), Er
 -- Esto se puede hacer mediante la auditoría de Oracle o mediante Triggers.
 
 
+
+
+
+------ testing
+  update notas_finales set fecha='20/09/16';
 
 
