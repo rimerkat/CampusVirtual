@@ -17,7 +17,7 @@ CREATE TABLE HISTORICO (
 	nombre VARCHAR2(20) NOT NULL, apellidos VARCHAR2(40) NOT NULL, 
 	expediente VARCHAR2(20) NOT NULL, usuarioOracle varchar2(20), 
 	codigoAsignatura VARCHAR(20) NOT NULL, nombreAsignatura VARCHAR2(30) NOT NULL, 
-	curso VARCHAR2(10) NOT NULL, nota NUMBER NOT NULL, calificacion VARCHAR2(10) NOT NULL  );
+	curso VARCHAR2(10) NOT NULL, nota NUMBER NOT NULL, calificacion VARCHAR2(10)  );
   
 -- (2)
 -- Realizar un JOB que se ejecute todos los años el día 15 de octubre y que almacene todos los datos en la tabla HISTORICO.
@@ -85,7 +85,11 @@ END;
 -- el usuario y la IP de cada modificación que se haga de las notas. 
 -- Esto se puede hacer mediante la auditoría de Oracle o mediante Triggers.
 
-
+CREATE OR REPLACE TRIGGER TR_CONTROL_CAMBIOS
+BEFORE UPDATE ON NOTAS_FINALES
+BEGIN
+	
+END TR_CONTROL_CAMBIOS;
 
 
 
