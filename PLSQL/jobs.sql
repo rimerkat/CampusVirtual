@@ -26,16 +26,20 @@ CREATE TABLE HISTORICO (
 -- (3.1) Si se produjera algún error, debe capturarse, para asegurarnos de que la copia se realiza con los demás alumnos y asignaturas. 
 -- Para ello se debe crear una tabla ERRORES donde aparezca el expediente del alumno, el código de la asignatura y el error
 -- que se ha producido.
-CREATE TABLE ERRORES (Expediente VARCHAR2(20), CodigoAsignatura VARCHAR2(20), ErrorC VARCHAR2(50));
+CREATE TABLE ERRORES (expediente VARCHAR2(20), codigoAsignatura VARCHAR2(20), errorC VARCHAR2(50));
 
 -- (3.2) Si la copia en el HISTORICO tuvo éxito para todos los alumnos de una asignatura, se deben borrar de la información 
 -- de las tablas correspondientes.
 -- NOTA: Para probarlo se puede disparar el JOB cada minuto y luego cambiar su frecuencia.
 
 --- (2.1) creamos el procedimiento que almacena los datos en la tabla HISTORICO:
-CREATE OR REPLACE PROCEDURE PR_UPLOAD_JOB AS  
-	CURSOR C_ASIGNATURA AS
-	SELECT asi.id, asi.nombre, asi.curso, us.nombre, us.apellidos, us.dni, nf.nota, nf.calificacion, us.expediente, orc.miuser
+CREATE OR REPLACE PROCEDURE PR_UPLOAD_JOB AS 
+
+	Expediente varchar2(20) default "";
+	CodigoAsignatura varchar2(20) default "";
+	CURSOR C_ASIGNATURAS IS
+	SELECT asi.id asigID, asi.nombre asig, asi.curso, us.nombre usNombre, us.apellidos usApellidos, us.dni, nf.nota,
+	nf.calificacion, us.expediente, orc.miuser usuarioOracle
 	FROM ASIGNATURAS asi
 	JOIN NOTAS_FINALES nf on nf.asignaturas_id = asi.id 
 	JOIN USUARIOS us on nf.usuarios_id = us.id
@@ -43,16 +47,20 @@ CREATE OR REPLACE PROCEDURE PR_UPLOAD_JOB AS
 	WHERE extract(month from nf.fecha) = '9'
 	ORDER BY asi.id;
 BEGIN
-	FOR VAR_ALUMNO IN C_ASIGNATURA LOOP -- Por cada alumno matriculado en una asignatura determinada, 
-	-- Introducimos los datos correspondientes y su nota final
-  		INSERT INTO HISTORICO VALUES(VAR_ALUMNO.nombre, VAR_ALUMNO.apellidos, VAR_ALUMNO.dni, VAR_ALUMNO.expediente, 
-					     VAR_ALUMNO.usuarioOracle, VAR_ALUMNO.codigoAsignatura, VAR_ALUMNO.nombreAsignatura, 
+        -- Introducimos los datos correspondientes las notas finales de todos los alumnos para todas las asignaturas
+	FOR VAR_ALUMNO IN C_ASIGNATURAS LOOP
+		Expediente := VAR_ALUMNO.expediente;
+		CodigoAsignatura := asigID;
+  		INSERT INTO HISTORICO VALUES(VAR_ALUMNO.usNombre, VAR_ALUMNO.usApellidos, VAR_ALUMNO.dni, VAR_ALUMNO.expediente, 
+					     VAR_ALUMNO.usuarioOracle, VAR_ALUMNO.asigID, VAR_ALUMNO.asig, 
 					     VAR_ALUMNO.curso, VAR_ALUMNO.nota, VAR_ALUMNO.calificacion);
 	END LOOP;
+
+-- (3.1) Si se produjera algún error, debe capturarse, para asegurarnos de que la copia se realiza con los demás alumnos y asignaturas. 
 EXCEPTION 
   WHEN OTHERS THEN -- captura todo tipo de error
       INSERT INTO errores VALUES (Expediente, CodigoAsignatura, 'Error number ' || SQLCODE || ' : ' || SQLERRM);
-END;
+      
 END PR_UPLOAD_JOB;
 
 -- (2.2) Creamos el job:
