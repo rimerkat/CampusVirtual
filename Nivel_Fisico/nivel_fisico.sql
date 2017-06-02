@@ -165,7 +165,28 @@ join ORACLE ora on ora.USUARIOS_id = us.id
 where USER = ora.miuser and roles.nombre='estudiante';
 
 -- damos permisos
-grant select, insert, update on V_RESULTADO to R_ALUMNO;
+grant select, update on V_RESULTADO to R_ALUMNO;
+
+-- Obviamente siendo V_RESULTADO una vista de varias tablas no se puede hacer un insert o update de forma directa en ella.
+-- Entonces creamos un disparador instead of:
+CREATE OR REPLACE TRIGGER TR_INSERTAR_EN_V_RESULTADO
+INSTEAD OF UPDATE ON V_RESULTADO
+FOR EACH ROW
+DECLARE
+  alumno_id number;
+BEGIN
+  SELECT id INTO alumno_id FROM USUARIOS WHERE dni = :old.dni;
+  -- si se modifica una respuesta ya existente
+  BEGIN
+      UPDATE RESPUESTAS SET respuesta = :new.respuesta WHERE preguntas_id = :old.preg_id AND usuarios_id = alumno_id ;  
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+  -- si se añade por primera vez una respuesta a una pregunta
+      INSERT INTO RESPUESTAS (id, respuesta, preguntas_id, usuarios_id) 
+      VALUES (concat(:old.preg_id,trunc(dbms_random.value(10,10000))), :new.respuesta, :old.preg_id, alumno_id);
+  END;
+END TR_INSERTAR_EN_V_RESULTADO;
+
 
 
 --8. Crear una tabla CONEXIONES con los campos SESIONID, USUARIO, IP, MAQUINA, INICIO, FIN. Crear un trigger de manera 
@@ -208,17 +229,18 @@ select * from ORACLE;
 -- Comprobamos que no podemos asignar un segundo usuario Oracle a un usuario del CV :
 EXECUTE PR_ASIGNA_USUARIO(12,'ALBERTO2','');
 
--- Ahora creamos una nueva conexión para un nuevo alumno p.e. RAM y nos conectamos de ese usuario :
+-- Ahora creamos una nueva conexión para un nuevo usuario p.e. RAM y nos conectamos de ese usuario :
 -- ¡¡ CUIDADO LOS NOMBRES DE USUARIOS Y LAS CONTRASEÑAS ESTÁN EN MAYÚSCULAS !!   
 --    CONTRASEÑA ES IGUAL QUE EL NOMBRE DE USUARIO (p.e. user = RAM, pass = RAM)
 
 -- Nos conectamos como usuario RAM (es profesor) para comprobar que se conecta bien 
 -- Comprobamos que puede crear actividades y preguntas..:
-INSERT INTO ACTIVIDADES(id,asignaturas_id,nombre) VALUES (1, 421, 'ACTIV1');
-INSERT INTO ACTIVIDADES(id,asignaturas_id,nombre) VALUES (2, 413, 'ACTIV1');
-INSERT INTO CUESTIONARIOS VALUES (1, sysdate, sysdate+3);
-INSERT INTO PREGUNTAS VALUES (1, 'PREGUNTA 1: blabla', 1);
-INSERT INTO PREGUNTAS VALUES (2, 'PREGUNTA 2: bla..', 1);
+INSERT INTO CAMPUS.ACTIVIDADES(id,asignaturas_id,nombre) VALUES (1, 421, 'ACTIV1');
+INSERT INTO CAMPUS.ACTIVIDADES(id,asignaturas_id,nombre) VALUES (2, 413, 'ACTIV1');
+INSERT INTO CAMPUS.CUESTIONARIOS VALUES (1, sysdate, sysdate+3);
+INSERT INTO CAMPUS.PREGUNTAS VALUES (1, 'PREGUNTA 1: blabla', 1);
+INSERT INTO CAMPUS.PREGUNTAS VALUES (2, 'PREGUNTA 2: bla..', 1);
+COMMIT; -- confirmamos los cambios para que sean visibles al resto de usuarios también
 
 -- Nos conectamos como usuario ALICIA (es alumna) 
 -- Comprobamos que sólo se puede ver sus propios datos 
@@ -226,14 +248,15 @@ select * from CAMPUS.V_DATOS_USUARIO;
 select * from CAMPUS.V_RESULTADO;
 
 -- Intentamos insertar una respuesta desde el usuario ALICIA:
- update CAMPUS.V_RESULTADO set RESPUESTA = 'respuesta Alicia' where ACT_ID = 1 and PREG_ID = 1; -- por ahora no deja hacerlo. hay que corregir algo de la vista
+ update CAMPUS.V_RESULTADO set RESPUESTA = 'respuesta Alicia' where ACT_ID = 1 and PREG_ID = 1;
 
 -- Nos conectamos como usuario DAVID (es administrativo)
 -- Comprobamos que puede crear, modificar ..etc usuarios, asignaturas y matriculas:
-INSERT INTO USUARIOS VALUES (02, 'C855510', 'Marta','Salva Gómez','martagz@gmail.com','españa',''); 
-INSERT INTO ASIGNATURAS VALUES (300, '2015/16', 'Legislaciones','A','1');
-INSERT INTO ROL_US_AS VALUES ('1', 300, 02);
+INSERT INTO CAMPUS.USUARIOS VALUES (02, 'C855510', 'Marta','Salva Gómez','martagz@gmail.com','españa',''); 
+INSERT INTO CAMPUS.ASIGNATURAS VALUES (300, '2015/16', 'Legislaciones','A','1');
+INSERT INTO CAMPUS.ROL_US_AS VALUES ('1', 300, 02);
+COMMIT; -- confirmamos los cambios para que sean visibles al resto de usuarios también
 
 -- Comprobamos que puede consultar las calificaciones de los alumnos:
-select * from V_CALIFICACIONES;
+select * from CAMPUS.V_CALIFICACIONES;
 
