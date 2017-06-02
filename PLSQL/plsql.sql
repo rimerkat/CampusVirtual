@@ -43,7 +43,7 @@ BEGIN
   -- vaya concediendo o revocando permisos a cada uno de los usuarios de la tabla según el valor de la columna ACTIVO
   -- ..siempre y cuando sea necesario, lo cual se comprobará en la vista DBA_TAB_PRIVS.
   SELECT count(*) INTO counter FROM DBA_TAB_PRIVS
-  WHERE OWNER = var_permisos.usuario AND TABLE_NAME = var_permisos.objeto AND PRIVILEGE = var_permisos.permiso;
+  WHERE GRANTEE = var_permisos.usuario AND TABLE_NAME = var_permisos.objeto AND PRIVILEGE = var_permisos.permiso;
   
   IF counter = 0 AND var_permisos.activo = 1 THEN
   -- vaya concediendo o revocando permisos a cada uno de los usuarios de la tabla según el valor de la columna ACTIVO
@@ -62,10 +62,10 @@ END PR_DAR_PERMISOS;
 
 EXECUTE PR_DAR_PERMISOS;
 
-select * from dba_tab_privs where owner = 'ALICIA';
-select * from dba_tab_privs where owner = 'ALBERTO';
-select * from dba_tab_privs where owner = 'RAM';
-select * from dba_tab_privs where owner = 'DAVID';
+select * from dba_tab_privs where grantee = 'ALICIA';
+select * from dba_tab_privs where grantee = 'ALBERTO';
+select * from dba_tab_privs where grantee = 'RAM';
+select * from dba_tab_privs where grantee = 'DAVID';
 
 
 
