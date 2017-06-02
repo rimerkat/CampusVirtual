@@ -260,3 +260,25 @@ COMMIT; -- confirmamos los cambios para que sean visibles al resto de usuarios t
 -- Comprobamos que puede consultar las calificaciones de los alumnos:
 select * from CAMPUS.V_CALIFICACIONES;
 
+-- *** EXTRA SENTENCIAS ***
+grant create index to campus; -- desde system
+
+-- INDEXES
+create index asig_idx on asignaturas(nombre,curso,grupoturno);
+create index usuario_idx on usuarios (nombre, apellidos) compute statistics;
+create index msj_idx on mensajes (usuarios_id,usuarios_id1);
+create index msj_idx_1 on mensajes (usuarios_id1,usuarios_id);
+create index resp_idx on respuestas(pregunta,respuesta,coreccion);
+
+-- SYNONYMS
+grant create synonym to campus; -- desde system
+
+create synonym T_RESPUESTAS for campus.respuestas;
+create synonym T_PREGUNTAS for campus.preguntas;
+create synonym T_ACTIVIDADES for campus.actividades;
+create synonym T_ASIGNATURAS for campus.asignaturas;
+create synonym T_USUARIOS for campus.usuarios;
+create synonym RESULTADOS for campus.V_RESULTADO;
+create synonym PERMISOS for campus.V_DATOS_USUARIO;
+create synonym ACTA for campus.V_CALIFICACIONES;
+
