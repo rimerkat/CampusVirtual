@@ -269,7 +269,16 @@ create unique index usuario_idx on usuarios (nombre, apellidos) compute statisti
 create index msj_env_idx on mensajes (usuarios_id,usuarios_id1);
 create index msj_rec_idx on mensajes (usuarios_id1,usuarios_id);
 create unique index resp_idx on respuestas(preguntas_id,respuesta,correccion);
-create bitmap index roles_idx  on rol_us_as (roles_rol, usuarios_id);
+--create bitmap index roles_idx  on rol_us_as (roles_rol, usuarios_id);
+-- Este último index no se ejecuta porque los indexes bitmap sólo se ejecutan en las versiones Entreprise de Oracle (según los foros):
+--Error que empieza en la línea: 1 del comando :
+--create bitmap index roles_idx  on rol_us_as (roles_rol, usuarios_id)
+--Informe de error -
+--Error SQL: ORA-00439: función no activada: Bit-mapped indexes
+--00439. 00000 -  "feature not enabled: %s"
+--*Cause:    The specified feature is not enabled.
+--*Action:   Do not attempt to use this feature.
+
 
 -- SYNONYMS
 grant create synonym to campus; -- desde system
