@@ -264,11 +264,12 @@ select * from CAMPUS.V_CALIFICACIONES;
 grant create index to campus; -- desde system
 
 -- INDEXES
-create index asig_idx on asignaturas(nombre,curso,grupoturno);
-create index usuario_idx on usuarios (nombre, apellidos) compute statistics;
-create index msj_idx on mensajes (usuarios_id,usuarios_id1);
-create index msj_idx_1 on mensajes (usuarios_id1,usuarios_id);
-create index resp_idx on respuestas(pregunta,respuesta,coreccion);
+create unique index asig_idx on asignaturas(nombre,curso,grupoturno);
+create unique index usuario_idx on usuarios (nombre, apellidos) compute statistics;
+create index msj_env_idx on mensajes (usuarios_id,usuarios_id1);
+create index msj_rec_idx on mensajes (usuarios_id1,usuarios_id);
+create unique index resp_idx on respuestas(preguntas_id,respuesta,correccion);
+create bitmap index roles_idx  on rol_us_as (roles_rol, usuarios_id);
 
 -- SYNONYMS
 grant create synonym to campus; -- desde system
